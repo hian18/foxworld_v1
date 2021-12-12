@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc name="Sorcerer Vip" script="data/npc/scripts/default.lua" walkinterval="2000" floorchange="0">
+	<health now="100" max="100"/>
+	<look type="133" head="59" body="3" legs="24" feet="76" addons="1"/>
+	<parameters>
+		<parameter key="module_shop" value="1"/>
+		<parameter key="message_greet" value="Ola |PLAYERNAME|. Eu vendo Itens Vips. Diga {trade} para comprar."/>
+		<parameter key="shop_buyable" value="blessed sceptre,7429,1000000;magma monocle,7900,1000000;magma coat,7899,1000000;magma legs,7894,1000000;mystical boots,2640,1000000;nightmare shield,6391,1000000"/>
+	</parameters>
+</npc>

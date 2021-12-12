@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<npc name="Furorius" script="data/npc/scripts/Furorius.lua" access="3" walkinterval="0" floorchange="0">
+ 	<look type="255" head="20" body="30" legs="40" feet="50"/>
+<parameters>
+      <parameter key="module_travel" value="1"/>
+		<parameter key="message_greet" value="Ohh you is a human |PLAYERNAME|? I can teleport you to Furorius, you need it? "/>
+              if msgcontains(msg, 'yes') then
+selfSay('/send ' .. creatureGetName(cid) .. ', 160 54 7')
+</parameters>
+</npc>

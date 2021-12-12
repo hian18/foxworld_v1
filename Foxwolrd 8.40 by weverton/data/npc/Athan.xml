@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc name="Gema" script="data/npc/scripts/default.lua" walkinterval="2000" floorchange="0">
+	<health now="100" max="100"/>
+	<look type="133" head="59" body="3" legs="24" feet="76" addons="1"/>
+	<parameters>
+		<parameter key="module_shop" value="1"/>
+		<parameter key="message_greet" value="Ola |PLAYERNAME|. Eu vendo gemas. Diga {trade} para comprar."/>
+		<parameter key="shop_buyable" value="gema de paladin,2158,1000000;gema de druid,2155,1000000;gema de sorcerer,2156,1000000;gema de knight,2153,1000000"/>
+	</parameters>
+</npc>

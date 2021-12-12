@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<npc name="Druid Vip" script="data/npc/scripts/default.lua" walkinterval="2000" floorchange="0">
+	<health now="100" max="100"/>
+	<look type="128" head="20" body="100" legs="50" feet="99"/>
+	<parameters>
+		<parameter key="module_shop" value="1"/>
+		<parameter key="message_greet" value="Ola |PLAYERNAME|. Eu vendo Itens Vips. Diga {trade} para comprar."/>
+		<parameter key="shop_buyable" value="queen's sceptre,7410,1000000;terra hood,7903,1000000;terra mantle,7884,1000000;terra legs,7885,1000000;mystical boots,2640,1000000;nightmare shield,6391,1000000"/>
+	</parameters>
+</npc>
