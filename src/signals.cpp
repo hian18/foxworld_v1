@@ -38,7 +38,6 @@
 #include "scheduler.h"
 #include "databasetasks.h"
 
-
 extern Scheduler g_scheduler;
 extern DatabaseTasks g_databaseTasks;
 extern Dispatcher g_dispatcher;
@@ -104,10 +103,10 @@ void sighupHandler()
 	g_game.raids.startup();
 	std::cout << "Reloaded raids." << std::endl;
 
-	g_spells->reload();
+	g_monsters.reload();
 	std::cout << "Reloaded monsters." << std::endl;
 
-	g_monsters.reload();
+	g_spells->reload();
 	std::cout << "Reloaded spells." << std::endl;
 
 	g_talkActions->reload();
@@ -153,7 +152,7 @@ void sigintHandler()
 // https://github.com/otland/forgottenserver/pull/2473
 void dispatchSignalHandler(int signal)
 {
-	switch(signal) {
+	switch (signal) {
 		case SIGINT: //Shuts the server down
 			g_dispatcher.addTask(createTask(sigintHandler));
 			break;

@@ -67,6 +67,7 @@ enum ItemParseAttributes_t {
 	ITEM_PARSE_DEFENSE,
 	ITEM_PARSE_EXTRADEF,
 	ITEM_PARSE_ATTACK,
+	ITEM_PARSE_ATTACK_SPEED,
 	ITEM_PARSE_ROTATETO,
 	ITEM_PARSE_MOVEABLE,
 	ITEM_PARSE_BLOCKPROJECTILE,
@@ -168,6 +169,7 @@ enum ItemParseAttributes_t {
 	ITEM_PARSE_BLOCKING,
 	ITEM_PARSE_ALLOWDISTREAD,
 	ITEM_PARSE_STOREITEM,
+	ITEM_PARSE_WORTH,
 };
 
 struct Abilities {
@@ -180,20 +182,20 @@ struct Abilities {
 	uint32_t conditionSuppressions = 0;
 
 	//stats modifiers
-	int32_t stats[STAT_LAST + 1] = { 0 };
-	int32_t statsPercent[STAT_LAST + 1] = { 0 };
+	std::array<int32_t, STAT_LAST + 1> stats = {0};
+	std::array<int32_t, STAT_LAST + 1> statsPercent = {0};
 
 	//extra skill modifiers
-	int32_t skills[SKILL_LAST + 1] = { 0 };
-	int32_t specialSkills[SPECIALSKILL_LAST + 1] = { 0 };
+	std::array<int32_t, SKILL_LAST + 1> skills = {0};
+	std::array<int32_t, SPECIALSKILL_LAST + 1> specialSkills = {0};
 
 	int32_t speed = 0;
 
 	// field damage abilities modifiers
-	int16_t fieldAbsorbPercent[COMBAT_COUNT] = { 0 };
+	std::array<int16_t, COMBAT_COUNT> fieldAbsorbPercent = {0};
 
 	//damage abilities modifiers
-	int16_t absorbPercent[COMBAT_COUNT] = { 0 };
+	std::array<int16_t, COMBAT_COUNT> absorbPercent = {0};
 
 	//elemental damage
 	uint16_t elementDamage = 0;
@@ -312,6 +314,7 @@ class ItemType
 		std::unique_ptr<Abilities> abilities;
 		std::unique_ptr<ConditionDamage> conditionDamage;
 
+		uint32_t attackSpeed = 0;
 		uint32_t weight = 0;
 		uint32_t levelDoor = 0;
 		uint32_t decayTime = 0;
@@ -328,6 +331,7 @@ class ItemType
 		uint16_t rotateTo = 0;
 		int32_t runeMagLevel = 0;
 		int32_t runeLevel = 0;
+		uint64_t worth = 0;
 
 		CombatType_t combatType = COMBAT_NONE;
 
@@ -356,6 +360,7 @@ class ItemType
 		uint8_t lightLevel = 0;
 		uint8_t lightColor = 0;
 		uint8_t shootRange = 1;
+		uint8_t classification = 0;
 		int8_t hitChance = 0;
 
 		bool storeItem = false;
@@ -391,8 +396,10 @@ class ItemType
 class Items
 {
 	public:
-		using NameMap = std::unordered_multimap<std::string, uint16_t>;
+		using NameMap = std::unordered_map<std::string, uint16_t>;
 		using InventoryVector = std::vector<uint16_t>;
+
+		using CurrencyMap = std::map<uint64_t, uint16_t, std::greater<uint64_t>>;
 
 		Items();
 
@@ -421,16 +428,12 @@ class Items
 		bool loadFromXml();
 		void parseItemNode(const pugi::xml_node& itemNode, uint16_t id);
 
-		void buildInventoryList();
-		const InventoryVector& getInventory() const {
-			return inventory;
-		}
-
 		size_t size() const {
 			return items.size();
 		}
 
 		NameMap nameToItems;
+		CurrencyMap currencyItems;
 
 	private:
 		std::vector<ItemType> items;
@@ -439,7 +442,7 @@ class Items
 		{
 			public:
 				ClientIdToServerIdMap() {
-					vec.reserve(30000);
+					vec.reserve(45000);
 				}
 
 				void emplace(uint16_t clientId, uint16_t serverId) {

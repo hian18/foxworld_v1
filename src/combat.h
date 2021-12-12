@@ -88,7 +88,7 @@ class MatrixArea
 
 	public:
 		MatrixArea() = default;
-		MatrixArea(uint32_t rows, uint32_t cols): rows{rows}, cols{cols}, arr(rows * cols) {}
+		MatrixArea(uint32_t rows, uint32_t cols): arr(rows * cols), rows{rows}, cols{cols} {}
 
 		bool operator()(uint32_t row, uint32_t col) const { return arr[row * cols + col]; }
 		bool& operator()(uint32_t row, uint32_t col) { return arr[row * cols + col]; }
@@ -110,7 +110,7 @@ class MatrixArea
 
 	private:
 		MatrixArea(Center center, uint32_t rows, uint32_t cols, Container&& arr):
-			rows{rows}, cols{cols}, arr{std::move(arr)}, center{std::move(center)} {}
+			arr{std::move(arr)}, center{std::move(center)}, rows{rows}, cols{cols} {}
 
 		Container arr = {};
 		Center center = {};
@@ -123,6 +123,7 @@ class AreaCombat
 		void setupArea(const std::vector<uint32_t>& vec, uint32_t rows);
 		void setupArea(int32_t length, int32_t spread);
 		void setupArea(int32_t radius);
+		void setupAreaRing(int32_t ring);
 		void setupExtArea(const std::vector<uint32_t>& vec, uint32_t rows);
 		const MatrixArea& getArea(const Position& centerPos, const Position& targetPos) const;
 
@@ -162,6 +163,8 @@ class Combat
 		CallBack* getCallback(CallBackParam_t key);
 
 		bool setParam(CombatParam_t param, uint32_t value);
+		int32_t getParam(CombatParam_t param);
+
 		void setArea(AreaCombat* area) {
 			this->area.reset(area);
 		}

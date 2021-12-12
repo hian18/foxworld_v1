@@ -25,6 +25,10 @@ THING_TYPE_NPC = CREATURETYPE_NPC + 1
 
 COMBAT_POISONDAMAGE = COMBAT_EARTHDAMAGE
 CONDITION_EXHAUST = CONDITION_EXHAUST_WEAPON
+MESSAGE_STATUS_CONSOLE_BLUE = MESSAGE_INFO_DESCR
+MESSAGE_STATUS_CONSOLE_RED = MESSAGE_STATUS_WARNING
+MESSAGE_EVENT_ORANGE = MESSAGE_STATUS_WARNING
+MESSAGE_STATUS_CONSOLE_ORANGE = MESSAGE_STATUS_WARNING
 TALKTYPE_ORANGE_1 = TALKTYPE_MONSTER_SAY
 TALKTYPE_ORANGE_2 = TALKTYPE_MONSTER_YELL
 
@@ -36,6 +40,8 @@ SOUTHWEST = DIRECTION_SOUTHWEST
 SOUTHEAST = DIRECTION_SOUTHEAST
 NORTHWEST = DIRECTION_NORTHWEST
 NORTHEAST = DIRECTION_NORTHEAST
+
+SPEECHBUBBLE_QUESTTRADER = SPEECHBUBBLE_QUEST
 
 do
 	local function CreatureIndex(self, key)
@@ -302,12 +308,12 @@ setCombatFormula = Combat.setFormula
 setCombatParam = Combat.setParameter
 
 Combat.setCondition = function(...)
-	print("[Warning] Function Combat.setCondition was renamed to Combat.addCondition and will be removed in the future")
+	print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Function Combat.setCondition was renamed to Combat.addCondition and will be removed in the future")
 	Combat.addCondition(...)
 end
 
 setCombatCondition = function(...)
-	print("[Warning] Function setCombatCondition was renamed to addCombatCondition and will be removed in the future")
+	print("[Warning - " .. debug.getinfo(2).source:match("@?(.*)") .. "] Function setCombatCondition was renamed to addCombatCondition and will be removed in the future")
 	Combat.addCondition(...)
 end
 
@@ -668,7 +674,7 @@ function doPlayerSendTextMessage(cid, type, text, ...) local p = Player(cid) ret
 function doSendAnimatedText() debugPrint("Deprecated function.") return true end
 function getPlayerAccountManager() debugPrint("Deprecated function.") return true end
 function doPlayerSetExperienceRate() debugPrint("Deprecated function, use Player:onGainExperience event instead.") return true end
-function doPlayerSetSkillLevel(cid, skill, value, ...) local p = Player(cid) return p and p:addSkill(skillId, value, round) end
+function doPlayerSetSkillLevel(cid, skillId, value, ...) local p = Player(cid) return p and p:addSkill(skillId, value, ...) end
 function doPlayerSetMagicLevel(cid, value) local p = Player(cid) return p and p:addMagicLevel(value) end
 function doPlayerAddLevel(cid, amount, round) local p = Player(cid) return p and p:addLevel(amount, round) end
 function doPlayerAddExp(cid, exp, useMult, ...)
@@ -1108,20 +1114,17 @@ function doTeleportThing(uid, dest, pushMovement)
 	if type(uid) == "userdata" then
 		if uid:isCreature() then
 			return uid:teleportTo(dest, pushMovement or false)
-		else
-			return uid:moveTo(dest)
 		end
+
+		return uid:moveTo(dest)
 	else
-		if uid >= 0x10000000 then
-			local creature = Creature(uid)
-			if creature then
-				return creature:teleportTo(dest, pushMovement or false)
+		local thing = getThing(uid)
+		if thing then
+			if thing:isCreature() then
+				return thing:teleportTo(dest, pushMovement or false)
 			end
-		else
-			local item = Item(uid)
-			if item then
-				return item:moveTo(dest)
-			end
+
+			return thing:moveTo(dest)
 		end
 	end
 	return false
@@ -1130,11 +1133,7 @@ end
 function getThingPos(uid)
 	local thing
 	if type(uid) ~= "userdata" then
-		if uid >= 0x10000000 then
-			thing = Creature(uid)
-		else
-			thing = Item(uid)
-		end
+		thing = getThing(uid)
 	else
 		thing = uid
 	end
@@ -1211,7 +1210,7 @@ function doRelocate(fromPos, toPos)
 end
 
 function getThing(uid)
-	return uid >= 0x10000000 and pushThing(Creature(uid)) or pushThing(Item(uid))
+	return uid >= CREATURE_ID_MIN and pushThing(Creature(uid)) or pushThing(Item(uid))
 end
 
 function getConfigInfo(info)
@@ -1302,9 +1301,10 @@ function broadcastMessage(message, messageType)
 	Game.broadcastMessage(message, messageType)
 	print("> Broadcasted message: \"" .. message .. "\".")
 end
+doBroadcastMessage = broadcastMessage
 
 function Guild.addMember(self, player)
-	return player:setGuild(guild)
+	return player:setGuild(self)
 end
 function Guild.removeMember(self, player)
 	return player:getGuild() == self and player:setGuild(nil)
@@ -1334,9 +1334,7 @@ function doSetCreatureOutfit(cid, outfit, time)
 	end
 
 	local condition = Condition(CONDITION_OUTFIT)
-	condition:setOutfit({
-		lookTypeEx = itemType:getId()
-	})
+	condition:setOutfit(outfit)
 	condition:setTicks(time)
 	creature:addCondition(condition)
 
@@ -1426,6 +1424,8 @@ function doSetCreatureLight(cid, lightLevel, lightColor, time)
 	creature:addCondition(condition)
 	return true
 end
+
+function getExperienceForLevel(level) return Game.getExperienceForLevel(level) end
 
 do
 	local combats = {

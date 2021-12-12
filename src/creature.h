@@ -71,6 +71,8 @@ class Tile;
 static constexpr int32_t EVENT_CREATURECOUNT = 10;
 static constexpr int32_t EVENT_CREATURE_THINK_INTERVAL = 1000;
 static constexpr int32_t EVENT_CHECK_CREATURE_INTERVAL = (EVENT_CREATURE_THINK_INTERVAL / EVENT_CREATURECOUNT);
+static constexpr uint32_t CREATURE_ID_MIN = 0x10000000;
+static constexpr uint32_t CREATURE_ID_MAX = std::numeric_limits<uint32_t>::max();
 
 class FrozenPathingConditionCall
 {
@@ -188,6 +190,9 @@ class Creature : virtual public Thing
 		virtual bool isInGhostMode() const {
 			return false;
 		}
+		virtual bool canSeeGhostMode(const Creature*) const {
+			return false;
+		}
 
 		int32_t getWalkDelay(Direction dir) const;
 		int32_t getWalkDelay() const;
@@ -226,6 +231,13 @@ class Creature : virtual public Thing
 		}
 		virtual int32_t getMaxHealth() const {
 			return healthMax;
+		}
+
+		void setDrunkenness(uint8_t newDrunkenness) {
+			drunkenness = newDrunkenness;
+		}
+		uint8_t getDrunkenness() const {
+			return drunkenness;
 		}
 
 		const Outfit_t getCurrentOutfit() const {
@@ -341,10 +353,11 @@ class Creature : virtual public Thing
 		void gainHealth(Creature* healer, int32_t healthGain);
 		virtual void drainHealth(Creature* attacker, int32_t damage);
 
-		virtual bool challengeCreature(Creature*) {
+		virtual bool challengeCreature(Creature*, bool) {
 			return false;
 		}
 
+		CreatureVector getKillers();
 		void onDeath();
 		virtual uint64_t getGainedExperience(Creature* attacker) const;
 		void addDamagePoints(Creature* attacker, int32_t damagePoints);
@@ -512,6 +525,7 @@ class Creature : virtual public Thing
 		int32_t varSpeed = 0;
 		int32_t health = 1000;
 		int32_t healthMax = 1000;
+		uint8_t drunkenness = 0;
 
 		Outfit_t currentOutfit;
 		Outfit_t defaultOutfit;
